@@ -1,6 +1,9 @@
 buildscript {
     ext {
         compose_version = '1.4.3'
+        configPropertiesFile = new File("local.properties")
+        configProperties = new Properties()
+        configProperties.load(new FileInputStream(configPropertiesFile))
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
