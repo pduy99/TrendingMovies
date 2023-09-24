@@ -39,7 +39,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder().apply {
-        baseUrl(BuildConfig.BASE_ULR)
+        baseUrl(BuildConfig.BASE_URL)
         client(okHttpClient)
         addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         addCallAdapterFactory(FlowResourceCallAdapterFactory())

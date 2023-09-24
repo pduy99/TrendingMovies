@@ -6,7 +6,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
 }
 
-def BASE_API_ENDPOINT = "BASE_ULR"
+def BASE_API_ENDPOINT = "BASE_URL"
 def API_KEY = "API_KEY"
 
 android {

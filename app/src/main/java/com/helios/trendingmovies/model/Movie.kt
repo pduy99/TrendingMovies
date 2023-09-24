@@ -23,4 +23,8 @@ data class Movie(
     @SerialName("video") var video: Boolean? = null,
     @SerialName("vote_average") var voteAverage: Double? = null,
     @SerialName("vote_count") var voteCount: Int? = null
-)
+) {
+    fun getFullImagePath(path: String): String {
+        return "https://image.tmdb.org/t/p/w500$path"
+    }
+}
