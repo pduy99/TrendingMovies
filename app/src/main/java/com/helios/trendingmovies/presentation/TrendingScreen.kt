@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -29,6 +30,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +49,8 @@ fun TrendingScreen(
     modifier: Modifier,
     uiState: AppUiState,
     onQueryChange: (String) -> Unit,
-    onMovieClick: (Int) -> Unit
+    onMovieClick: (Int) -> Unit,
+    atBottomList: () -> Unit,
 ) {
 
     var searchActive by remember {
@@ -55,6 +58,10 @@ fun TrendingScreen(
     }
     val movies = uiState.movies
     val errorMessage = uiState.errorMessage?.getContentOrNull()
+    val gridScrollState = rememberLazyGridState()
+    LaunchedEffect(!gridScrollState.canScrollForward) {
+        atBottomList()
+    }
 
     Scaffold(
         topBar = {
@@ -110,24 +117,24 @@ fun TrendingScreen(
                 },
                 content = { }
             )
+            LazyVerticalGrid(
+                state = gridScrollState,
+                columns = GridCells.Adaptive(120.dp),
+                modifier = modifier.padding(8.dp),
+                contentPadding = PaddingValues(4.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(movies) { movie ->
+                    MovieCard(movie) {
+                        onMovieClick(it)
+                    }
+                }
+            }
             if (uiState.isLoading) {
                 CircularProgressIndicator()
             } else if (errorMessage != null) {
                 Toast.makeText(LocalContext.current, errorMessage, Toast.LENGTH_SHORT).show()
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(120.dp),
-                    modifier = modifier.padding(8.dp),
-                    contentPadding = PaddingValues(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    items(movies) { movie ->
-                        MovieCard(movie) {
-                            onMovieClick(it)
-                        }
-                    }
-                }
             }
         }
     }

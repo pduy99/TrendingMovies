@@ -36,7 +36,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             modifier = modifier,
             uiState = uiState,
             onQueryChange = viewModel::onQueryChanged,
-            onMovieClick = viewModel::onMovieClicked
+            onMovieClick = viewModel::onMovieClicked,
+            atBottomList = viewModel::getTrendingMovies
         )
     }
 
@@ -55,17 +56,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     ) {
         MovieDetailsScreen(uiState = uiState, viewModel::resetHomeScreenState)
     }
-
-//    if (uiState.isShowingHomePage) {
-//        TrendingScreen(
-//            modifier = modifier,
-//            uiState = uiState,
-//            onQueryChange = viewModel::onQueryChanged,
-//            onMovieClick = viewModel::onMovieClicked
-//        )
-//    } else {
-//        MovieDetailsScreen(uiState = uiState, viewModel::resetHomeScreenState)
-//    }
 }
 
 

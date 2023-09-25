@@ -7,6 +7,7 @@ import com.helios.trendingmovies.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onCompletion
 import javax.inject.Inject
 
 /**
@@ -16,8 +17,12 @@ class RemoteDataSource @Inject constructor(
     private val apiService: MovieApiService
 ) : DataSource {
 
+    private var currentPage = 1
     override fun getTrendingMovies(): Flow<Resource<MoviesCollection>> {
-        return apiService.getTrendingMovies().flowOn(Dispatchers.IO)
+        return apiService.getTrendingMovies(page = currentPage).flowOn(Dispatchers.IO)
+            .onCompletion {
+                currentPage += 1
+            }
     }
 
     override fun searchMovie(query: String): Flow<Resource<MoviesCollection>> {

@@ -28,7 +28,7 @@ class TrendingMovieViewModel @Inject constructor(
         getTrendingMovies()
     }
 
-    private fun getTrendingMovies() {
+    fun getTrendingMovies() {
         movieRepository.getTrendingMovies().onStart {
             _uiState.value = _uiState.value.copy(title = "Trending movies")
         }.catch {
@@ -43,8 +43,13 @@ class TrendingMovieViewModel @Inject constructor(
                 }
 
                 is Resource.Success -> {
+                    val newMovies = mutableListOf<Movie>().apply {
+                        addAll(_uiState.value.movies)
+                        addAll(resource.data.movies)
+                    }
+
                     _uiState.value =
-                        _uiState.value.copy(isLoading = false, movies = resource.data.movies)
+                        _uiState.value.copy(isLoading = false, movies = newMovies)
                 }
 
                 is Resource.Error -> {

@@ -13,7 +13,10 @@ import retrofit2.http.Query
  */
 interface MovieApiService {
     @GET("trending/movie/{time_window}")
-    fun getTrendingMovies(@Path("time_window") timeWindow: String = "day"): Flow<Resource<MoviesCollection>>
+    fun getTrendingMovies(
+        @Path("time_window") timeWindow: String = "day",
+        @Query("page") page: Int = 1
+    ): Flow<Resource<MoviesCollection>>
 
     @GET("movie/{movie_id}")
     fun getMovieDetail(@Path("movie_id") movieId: Int): Flow<Resource<MovieDetail>>
