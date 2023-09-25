@@ -8,6 +8,6 @@ import kotlinx.serialization.SerialName
 
 @kotlinx.serialization.Serializable
 data class ProductionCountry(
-    @SerialName("iso_3166_1") val iso: String,
-    @SerialName("name") val name: String,
+    @SerialName("iso_3166_1") val iso: String? = null,
+    @SerialName("name") val name: String? = null,
 )

@@ -6,10 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.helios.trendingmovies.presentation.home.HomeScreen
+import com.helios.trendingmovies.presentation.HomeScreen
 import com.helios.trendingmovies.ui.theme.TrendingMoviesTheme
 import dagger.hilt.android.AndroidEntryPoint
 

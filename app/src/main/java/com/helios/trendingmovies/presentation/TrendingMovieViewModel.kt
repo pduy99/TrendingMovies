@@ -1,5 +1,6 @@
-package com.helios.trendingmovies.presentation.home
+package com.helios.trendingmovies.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.helios.trendingmovies.data.repository.MovieRepository
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class TrendingMovieViewModel @Inject constructor(
     private val movieRepository: MovieRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AppUiState())
@@ -27,21 +28,30 @@ class HomeViewModel @Inject constructor(
         getTrendingMovies()
     }
 
-    fun getTrendingMovies() {
+    private fun getTrendingMovies() {
         movieRepository.getTrendingMovies().onStart {
             _uiState.value = _uiState.value.copy(title = "Trending movies")
         }.catch {
-            _uiState.value = _uiState.value.copy(errorMessage = Event(it.message ?: "Something went wrong"), isLoading = false)
-        }.onEach {resource ->
-            when(resource) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = Event(it.message ?: "Something went wrong"),
+                isLoading = false
+            )
+        }.onEach { resource ->
+            when (resource) {
                 is Resource.Loading -> {
                     _uiState.value = _uiState.value.copy(isLoading = true)
                 }
+
                 is Resource.Success -> {
-                    _uiState.value = _uiState.value.copy(isLoading = false, movies = resource.data.movies)
+                    _uiState.value =
+                        _uiState.value.copy(isLoading = false, movies = resource.data.movies)
                 }
+
                 is Resource.Error -> {
-                    _uiState.value = _uiState.value.copy(isLoading = false, toastMessage = Event(resource.throwable.message ?: "Something went wrong"))
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMessage = Event(resource.throwable.message ?: "Something went wrong")
+                    )
                 }
             }
         }.launchIn(viewModelScope)
@@ -53,58 +63,80 @@ class HomeViewModel @Inject constructor(
             movieRepository.searchMovie(query).onStart {
                 _uiState.value = _uiState.value.copy(title = "Search results")
             }.catch {
-                _uiState.value = _uiState.value.copy(errorMessage = Event(it.message ?: "Something went wrong"), isLoading = false)
-            }.onEach {resource ->
-                when(resource) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = Event(it.message ?: "Something went wrong"),
+                    isLoading = false
+                )
+            }.onEach { resource ->
+                when (resource) {
                     is Resource.Loading -> {
                         _uiState.value = _uiState.value.copy(isLoading = true)
                     }
+
                     is Resource.Success -> {
-                        _uiState.value = _uiState.value.copy(isLoading = false, movies = resource.data.movies)
+                        _uiState.value =
+                            _uiState.value.copy(isLoading = false, movies = resource.data.movies)
                     }
+
                     is Resource.Error -> {
-                        _uiState.value = _uiState.value.copy(isLoading = false, toastMessage = Event(resource.throwable.message ?: "Something went wrong"))
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            errorMessage = Event(
+                                resource.throwable.message ?: "Something went wrong"
+                            )
+                        )
                     }
                 }
             }.launchIn(viewModelScope)
-        }
-        else {
+        } else {
             getTrendingMovies()
         }
     }
 
     fun resetHomeScreenState() {
-        _uiState.value = _uiState.value.copy(isShowingHomePage = true, currentSelectedMovie = null)
+        _uiState.value = _uiState.value.copy(isShowingHomePage = true)
     }
 
     fun onMovieClicked(movieId: Int) {
         movieRepository.getMovieDetail(movieId).onStart {
             _uiState.value = _uiState.value.copy(isShowingHomePage = false)
         }.catch {
-            _uiState.value = _uiState.value.copy(errorMessage = Event(it.message ?: "Something went wrong"), isLoading = false)
-        }.onEach {resource ->
-            when(resource) {
+            Log.e(TAG, "Error: ${it.message}")
+            _uiState.value = _uiState.value.copy(
+                errorMessage = Event(it.message ?: "Something went wrong"),
+                isLoading = false
+            )
+        }.onEach { resource ->
+            when (resource) {
                 is Resource.Loading -> {
                     _uiState.value = _uiState.value.copy(isLoading = true)
                 }
+
                 is Resource.Success -> {
-                    _uiState.value = _uiState.value.copy(isLoading = false, currentSelectedMovie = resource.data)
+                    _uiState.value =
+                        _uiState.value.copy(isLoading = false, currentSelectedMovie = resource.data)
                 }
+
                 is Resource.Error -> {
-                    _uiState.value = _uiState.value.copy(isLoading = false, toastMessage = Event(resource.throwable.message ?: "Something went wrong"))
+                    Log.e(TAG, "Error: ${resource.throwable.message}")
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMessage = Event(resource.throwable.message ?: "Something went wrong")
+                    )
                 }
             }
         }.launchIn(viewModelScope)
     }
 }
 
+private const val TAG = "TrendingMovieViewModel"
+
 data class AppUiState(
     val movies: List<Movie> = emptyList(),
-    val currentSelectedMovie : MovieDetail? = null,
+    val currentSelectedMovie: MovieDetail? = null,
     val isShowingHomePage: Boolean = true,
     val isLoading: Boolean = false,
     val searchText: String = "",
-    val toastMessage: Event<String>? = null,
     val errorMessage: Event<String>? = null,
     val title: String = ""
 )

@@ -36,12 +36,17 @@ object NetworkModule {
         addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
     }.build()
 
+    private val json: Json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
+
     @Provides
     @Singleton
     fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder().apply {
         baseUrl(BuildConfig.BASE_URL)
         client(okHttpClient)
-        addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
         addCallAdapterFactory(FlowResourceCallAdapterFactory())
     }.build()
 
