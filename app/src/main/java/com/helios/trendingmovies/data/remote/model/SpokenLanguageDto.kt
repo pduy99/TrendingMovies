@@ -1,4 +1,4 @@
-package com.helios.trendingmovies.model
+package com.helios.trendingmovies.data.remote.model
 
 import kotlinx.serialization.SerialName
 
@@ -7,7 +7,7 @@ import kotlinx.serialization.SerialName
  */
 
 @kotlinx.serialization.Serializable
-data class SpokenLanguage(
+data class SpokenLanguageDto(
     @SerialName("english_name") val englishName: String? = null,
     @SerialName("iso_639_1") val iso: String? = null,
     @SerialName("name") val name: String? = null

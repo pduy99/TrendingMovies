@@ -41,7 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.helios.trendingmovies.model.Movie
+import com.helios.trendingmovies.domain.model.Movie
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,8 +59,10 @@ fun TrendingScreen(
     val movies = uiState.movies
     val errorMessage = uiState.errorMessage?.getContentOrNull()
     val gridScrollState = rememberLazyGridState()
-    LaunchedEffect(!gridScrollState.canScrollForward) {
-        atBottomList()
+    LaunchedEffect(gridScrollState.isScrollInProgress && !gridScrollState.canScrollForward) {
+        if (movies.isNotEmpty()) {
+            atBottomList()
+        }
     }
 
     Scaffold(
@@ -119,7 +121,7 @@ fun TrendingScreen(
             )
             LazyVerticalGrid(
                 state = gridScrollState,
-                columns = GridCells.Adaptive(120.dp),
+                columns = GridCells.Adaptive(180.dp),
                 modifier = modifier.padding(8.dp),
                 contentPadding = PaddingValues(4.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -134,7 +136,7 @@ fun TrendingScreen(
             if (uiState.isLoading) {
                 CircularProgressIndicator()
             } else if (errorMessage != null) {
-                Toast.makeText(LocalContext.current, errorMessage, Toast.LENGTH_SHORT).show()
+                Toast.makeText(LocalContext.current, errorMessage, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -148,7 +150,7 @@ fun MovieCard(movie: Movie, modifier: Modifier = Modifier, onMovieClick: (movieI
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
-        onClick = { onMovieClick(movie.id!!) },
+        onClick = { onMovieClick(movie.id) },
     ) {
         Column(
             modifier = Modifier
@@ -165,7 +167,7 @@ fun MovieCard(movie: Movie, modifier: Modifier = Modifier, onMovieClick: (movieI
                 modifier = Modifier.fillMaxWidth()
             )
             Column(modifier = Modifier.padding(8.dp)) {
-                Text(text = movie.title!!, style = MaterialTheme.typography.bodyLarge, maxLines = 1)
+                Text(text = movie.title, style = MaterialTheme.typography.bodyLarge, maxLines = 1)
                 Spacer(modifier = Modifier.height(15.dp))
                 Text(
                     text = "Year: ${movie.releaseDate}",

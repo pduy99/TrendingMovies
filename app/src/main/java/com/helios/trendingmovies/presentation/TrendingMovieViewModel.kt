@@ -4,8 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.helios.trendingmovies.data.repository.MovieRepository
-import com.helios.trendingmovies.model.Movie
-import com.helios.trendingmovies.model.MovieDetail
+import com.helios.trendingmovies.domain.model.Movie
 import com.helios.trendingmovies.utils.Event
 import com.helios.trendingmovies.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,13 +24,14 @@ class TrendingMovieViewModel @Inject constructor(
     val uiState: StateFlow<AppUiState> = _uiState
 
     init {
-        getTrendingMovies()
+        getTrendingMovies(false)
     }
 
-    fun getTrendingMovies() {
-        movieRepository.getTrendingMovies().onStart {
+    fun getTrendingMovies(fetchRemote: Boolean) {
+        movieRepository.getTrendingMovies(fetchRemote).onStart {
             _uiState.value = _uiState.value.copy(title = "Trending movies")
         }.catch {
+            Log.e(TAG, "Error: ${it.printStackTrace()}")
             _uiState.value = _uiState.value.copy(
                 errorMessage = Event(it.message ?: "Something went wrong"),
                 isLoading = false
@@ -43,13 +43,8 @@ class TrendingMovieViewModel @Inject constructor(
                 }
 
                 is Resource.Success -> {
-                    val newMovies = mutableListOf<Movie>().apply {
-                        addAll(_uiState.value.movies)
-                        addAll(resource.data.movies)
-                    }
-
                     _uiState.value =
-                        _uiState.value.copy(isLoading = false, movies = newMovies)
+                        _uiState.value.copy(isLoading = false, movies = resource.data)
                 }
 
                 is Resource.Error -> {
@@ -80,7 +75,7 @@ class TrendingMovieViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         _uiState.value =
-                            _uiState.value.copy(isLoading = false, movies = resource.data.movies)
+                            _uiState.value.copy(isLoading = false, movies = resource.data)
                     }
 
                     is Resource.Error -> {
@@ -94,7 +89,7 @@ class TrendingMovieViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
         } else {
-            getTrendingMovies()
+            getTrendingMovies(false)
         }
     }
 
@@ -138,7 +133,7 @@ private const val TAG = "TrendingMovieViewModel"
 
 data class AppUiState(
     val movies: List<Movie> = emptyList(),
-    val currentSelectedMovie: MovieDetail? = null,
+    val currentSelectedMovie: Movie? = null,
     val isShowingHomePage: Boolean = true,
     val isLoading: Boolean = false,
     val searchText: String = "",

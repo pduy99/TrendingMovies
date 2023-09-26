@@ -1,10 +1,13 @@
 package com.helios.trendingmovies.di
 
+import android.content.Context
+import com.helios.trendingmovies.data.datsource.LocalDataSource
 import com.helios.trendingmovies.data.datsource.RemoteDataSource
 import com.helios.trendingmovies.data.repository.MovieRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -18,6 +21,10 @@ object RepositoryModule {
 
     @Singleton
     @Provides
-    fun providesMovieRepository(remoteDataSource: RemoteDataSource) =
-        MovieRepository(remoteDataSource)
+    fun providesMovieRepository(
+        remoteDataSource: RemoteDataSource,
+        localDataSource: LocalDataSource,
+        @ApplicationContext applicationContext: Context
+    ) =
+        MovieRepository(remoteDataSource, localDataSource, applicationContext)
 }

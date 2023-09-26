@@ -1,5 +1,6 @@
 package com.helios.trendingmovies.presentation
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -37,7 +38,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             uiState = uiState,
             onQueryChange = viewModel::onQueryChanged,
             onMovieClick = viewModel::onMovieClicked,
-            atBottomList = viewModel::getTrendingMovies
+            atBottomList = {
+                Log.d("DUY", "AT BOTTOM")
+                viewModel.getTrendingMovies(true)
+            }
         )
     }
 

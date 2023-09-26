@@ -1,23 +1,42 @@
 package com.helios.trendingmovies.data.datsource
 
-import com.helios.trendingmovies.model.MovieDetail
-import com.helios.trendingmovies.model.MoviesCollection
-import com.helios.trendingmovies.utils.Resource
+import com.helios.trendingmovies.data.local.MovieDao
+import com.helios.trendingmovies.data.mapper.ModelMapper
+import com.helios.trendingmovies.domain.model.Movie
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 /**
  * Created by phpduy99 on 24/09/2023
  */
-class LocalDataSource : DataSource {
-    override fun getTrendingMovies(): Flow<Resource<MoviesCollection>> {
-        TODO("Not yet implemented")
+class LocalDataSource @Inject constructor(
+    private val movieDao: MovieDao,
+    private val mapper: ModelMapper
+) {
+    fun getSavedTrendingMovies(): Flow<List<Movie>> {
+        return movieDao.getAllMovies().flowOn(Dispatchers.IO).map {
+            it.map { roomMovie ->
+                mapper.mapRoomMovieEntity(roomMovie)
+            }
+        }
     }
 
-    override fun searchMovie(query: String): Flow<Resource<MoviesCollection>> {
-        TODO("Not yet implemented")
+    fun getMovieById(id: Int): Flow<Movie?> {
+        return movieDao.getMovieById(id).flowOn(Dispatchers.IO).map {
+            it?.let {
+                mapper.mapRoomMovieEntity(it)
+            }
+        }
     }
 
-    override fun getMovieDetail(id: Int): Flow<Resource<MovieDetail>> {
-        TODO("Not yet implemented")
+    suspend fun updateMovie(movie: Movie) {
+        movieDao.update(mapper.mapToRoomMovie(movie))
+    }
+
+    suspend fun insertMovie(movie: Movie) {
+        movieDao.insert(mapper.mapToRoomMovie(movie))
     }
 }

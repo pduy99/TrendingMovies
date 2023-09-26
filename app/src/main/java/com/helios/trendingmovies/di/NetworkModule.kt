@@ -1,8 +1,8 @@
 package com.helios.trendingmovies.di
 
 import com.helios.trendingmovies.BuildConfig
-import com.helios.trendingmovies.network.MovieApiService
-import com.helios.trendingmovies.network.interceptor.ApiKeyInterceptor
+import com.helios.trendingmovies.data.remote.MovieApiService
+import com.helios.trendingmovies.data.remote.interceptor.ApiKeyInterceptor
 import com.helios.trendingmovies.utils.FlowResourceCallAdapterFactory
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module

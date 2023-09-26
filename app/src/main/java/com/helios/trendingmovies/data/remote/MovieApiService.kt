@@ -1,7 +1,7 @@
-package com.helios.trendingmovies.network
+package com.helios.trendingmovies.data.remote
 
-import com.helios.trendingmovies.model.MovieDetail
-import com.helios.trendingmovies.model.MoviesCollection
+import com.helios.trendingmovies.data.remote.model.MovieDetailDto
+import com.helios.trendingmovies.data.remote.model.MoviesPagingDto
 import com.helios.trendingmovies.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import retrofit2.http.GET
@@ -16,11 +16,11 @@ interface MovieApiService {
     fun getTrendingMovies(
         @Path("time_window") timeWindow: String = "day",
         @Query("page") page: Int = 1
-    ): Flow<Resource<MoviesCollection>>
+    ): Flow<Resource<MoviesPagingDto>>
 
     @GET("movie/{movie_id}")
-    fun getMovieDetail(@Path("movie_id") movieId: Int): Flow<Resource<MovieDetail>>
+    fun getMovieDetail(@Path("movie_id") movieId: Int): Flow<Resource<MovieDetailDto>>
 
     @GET("search/movie")
-    fun searchMovie(@Query("query") query: String): Flow<Resource<MoviesCollection>>
+    fun searchMovie(@Query("query") query: String): Flow<Resource<MoviesPagingDto>>
 }

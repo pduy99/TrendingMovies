@@ -1,7 +1,6 @@
 package com.helios.trendingmovies.data.datsource
 
-import com.helios.trendingmovies.model.MovieDetail
-import com.helios.trendingmovies.model.MoviesCollection
+import com.helios.trendingmovies.domain.model.Movie
 import com.helios.trendingmovies.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
@@ -11,9 +10,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface DataSource {
 
-    fun getTrendingMovies(): Flow<Resource<MoviesCollection>>
+    fun getTrendingMovies(page: Int): Flow<Resource<List<Movie>>>
 
-    fun searchMovie(query: String): Flow<Resource<MoviesCollection>>
+    fun searchMovie(query: String): Flow<Resource<List<Movie>>>
 
-    fun getMovieDetail(id: Int): Flow<Resource<MovieDetail>>
+    fun getMovieDetail(id: Int): Flow<Resource<Movie>>
 }

@@ -40,13 +40,12 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.helios.trendingmovies.common.HyperlinkText
 import com.helios.trendingmovies.common.RatingBar
-import com.helios.trendingmovies.model.MovieDetail
+import com.helios.trendingmovies.domain.model.Movie
 import com.helios.trendingmovies.utils.formattedYear
 import com.helios.trendingmovies.utils.minuteToTime
 import java.util.Locale
@@ -105,11 +104,11 @@ fun MovieDetailsScreen(
 
 
 @Composable
-fun ItemPoster(movieDetail: MovieDetail) {
+fun ItemPoster(movie: Movie) {
     Box(modifier = Modifier.padding(horizontal = 15.dp)) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(movieDetail.getFullImagePath(movieDetail.backdropPath ?: "")).crossfade(true)
+                .data(movie.getFullImagePath(movie.backdropPath ?: "")).crossfade(true)
                 .build(),
             contentDescription = null,
             contentScale = ContentScale.FillBounds,
@@ -122,7 +121,7 @@ fun ItemPoster(movieDetail: MovieDetail) {
 
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(movieDetail.getFullImagePath(movieDetail.posterPath ?: "")).crossfade(true)
+                .data(movie.getFullImagePath(movie.posterPath ?: "")).crossfade(true)
                 .build(),
             contentDescription = null,
             contentScale = ContentScale.FillBounds,
@@ -136,29 +135,16 @@ fun ItemPoster(movieDetail: MovieDetail) {
 }
 
 @Composable
-@Preview
-fun ItemTitlePreview() {
-    ItemTitle(
-        MovieDetail(
-            title = "No One Will Save You",
-            voteAverage = 8.0,
-            releaseDate = "2023-09-22",
-            originalTitle = "EN"
-        )
-    )
-}
-
-@Composable
-fun ItemTitle(movieDetail: MovieDetail) {
+fun ItemTitle(movie: Movie) {
 
     Spacer(modifier = Modifier.height(20.dp))
 
-    val title = movieDetail.title ?: ""
+    val title = movie.title
     Text(
         text = buildAnnotatedString {
             append(title); append(" ");withStyle(style = SpanStyle(color = Color.Gray)) {
             append(
-                "(${formattedYear(movieDetail.releaseDate)})"
+                "(${formattedYear(movie.releaseDate)})"
             )
         }
         },
@@ -183,11 +169,11 @@ fun ItemTitle(movieDetail: MovieDetail) {
             modifier = Modifier.padding(end = 10.dp)
         )
 
-        val originalLanguage = if (movieDetail.originalLanguage != null) {
-            " (${movieDetail.originalLanguage!!.uppercase(Locale.ROOT)})"
+        val originalLanguage = if (movie.originalLanguage != null) {
+            " (${movie.originalLanguage.uppercase(Locale.ROOT)})"
         } else ""
         Text(
-            text = movieDetail.releaseDate + originalLanguage + " " + movieDetail.runtime?.let {
+            text = movie.releaseDate + originalLanguage + " " + movie.runtime?.let {
                 minuteToTime(it)
             },
             style = MaterialTheme.typography.bodyLarge,
@@ -201,10 +187,10 @@ fun ItemTitle(movieDetail: MovieDetail) {
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth(),
         content = {
-            movieDetail.genres.forEach {
+            movie.genresName.forEach {
                 item {
                     Text(
-                        text = if (it == movieDetail.genres.last()) it.name else it.name + ", ",
+                        text = if (it == movie.genresName.last()) it else "$it, ",
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.Gray,
                         maxLines = 1
@@ -228,7 +214,7 @@ fun ItemTitle(movieDetail: MovieDetail) {
             modifier = Modifier.padding(start = 10.dp, end = 15.dp)
         )
         RatingBar(
-            (movieDetail.voteAverage?.toFloat()?.div(2)) ?: 0f, modifier = Modifier
+            (movie.voteAverage?.toFloat()?.div(2)) ?: 0f, modifier = Modifier
                 .height(25.dp)
                 .wrapContentSize()
         )
@@ -236,7 +222,7 @@ fun ItemTitle(movieDetail: MovieDetail) {
 }
 
 @Composable
-fun ItemOverview(movieDetail: MovieDetail) {
+fun ItemOverview(movie: Movie) {
     Spacer(modifier = Modifier.height(15.dp))
     Text(
         text = "Overview",
@@ -247,7 +233,7 @@ fun ItemOverview(movieDetail: MovieDetail) {
     Spacer(modifier = Modifier.height(10.dp))
     val lineHeight = MaterialTheme.typography.bodyLarge.fontSize * 4 / 3
     Text(
-        text = movieDetail.overview ?: "",
+        text = movie.overview ?: "",
         style = MaterialTheme.typography.bodyLarge,
         lineHeight = lineHeight,
         modifier = Modifier.padding(horizontal = 15.dp)
@@ -255,7 +241,7 @@ fun ItemOverview(movieDetail: MovieDetail) {
 }
 
 @Composable
-fun ItemInformation(movieDetail: MovieDetail) {
+fun ItemInformation(movie: Movie) {
     Spacer(modifier = Modifier.height(15.dp))
     Text(
         text = "Information",
@@ -264,7 +250,7 @@ fun ItemInformation(movieDetail: MovieDetail) {
         modifier = Modifier.padding(start = 15.dp)
     )
     Spacer(modifier = Modifier.height(10.dp))
-    movieDetail.homepage?.let {
+    movie.homepage?.let {
         Row(modifier = Modifier.padding(horizontal = 15.dp)) {
             Icon(imageVector = Icons.Default.Home, null)
             Spacer(modifier = Modifier.width(10.dp))
@@ -272,7 +258,7 @@ fun ItemInformation(movieDetail: MovieDetail) {
         }
     }
     Spacer(modifier = Modifier.height(10.dp))
-    movieDetail.adult?.let {
+    movie.adult?.let {
         Row(modifier = Modifier.padding(horizontal = 15.dp)) {
             Icon(imageVector = Icons.Default.NoAdultContent, null)
             Spacer(modifier = Modifier.width(10.dp))
@@ -280,7 +266,7 @@ fun ItemInformation(movieDetail: MovieDetail) {
         }
     }
     Spacer(modifier = Modifier.height(10.dp))
-    movieDetail.tagline?.let {
+    movie.tagline?.let {
         Row(modifier = Modifier.padding(horizontal = 15.dp)) {
             Icon(imageVector = Icons.Default.Tag, null)
             Spacer(modifier = Modifier.width(10.dp))
