@@ -54,15 +54,14 @@ class MovieRepository @Inject constructor(
     }
 
     fun getMovieDetail(id: Int): Flow<Resource<Movie>> {
-        return channelFlow {
-            localDataSource.getMovieById(id).collectLatest { localMovie ->
-                if (localMovie != null && localMovie.detailLoaded) {
-                    send(Resource.Success(localMovie))
-                } else {
-                    remoteDataSource.getMovieDetail(id).onEach { resource ->
-                        send(resource)
-                    }
-                }
+        return flow {
+            val localMovie = localDataSource.getMovieById(id).firstOrNull()
+            if (localMovie != null && localMovie.detailLoaded) {
+                emit(Resource.Success(localMovie))
+            } else {
+                remoteDataSource.getMovieDetail(id).onEach { resource ->
+                    emit(resource)
+                }.collect()
             }
         }
     }

@@ -39,8 +39,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             onQueryChange = viewModel::onQueryChanged,
             onMovieClick = viewModel::onMovieClicked,
             atBottomList = {
-                Log.d("DUY", "AT BOTTOM")
-                viewModel.getTrendingMovies(true)
+                if (uiState.searchText.isEmpty()) {
+                    viewModel.getTrendingMovies(true)
+                }
             }
         )
     }
